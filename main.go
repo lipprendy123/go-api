@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
-	"net/http"
+
+	"pustaka-api/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,66 +10,17 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.GET("/", rootHandler)
+	v1 := router.Group("/v1")
 
-	router.GET("/hello", helloHandler)
+	v1.GET("/", handler.RootHandler)
 
-	router.GET("/book/:id", bookHandler)
+	v1.GET("/hello", handler.HelloHandler)
 
-	router.GET("/query", queryHandler)
+	v1.GET("/book/:id", handler.BookHandler)
 
-	router.POST("/books", postBooksHandler)
+	v1.GET("/query", handler.QueryHandler)
+
+	v1.POST("/books", handler.PostBooksHandler)
 	
 	router.Run()
 }
-
-func rootHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-			"name": "Alif Rendy",
-			"bio":  "Just ordinary people",
-		})
-}
-
-func helloHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-			"title" : "Hello World!!",
-			"subtitle" : "Belajar golang",
-		})
-}
-
-func bookHandler(c *gin.Context) {
-	id := c.Param("id")
-
-	c.JSON(http.StatusOK, gin.H{"id": id})
-}
-
-func queryHandler(c *gin.Context) {
-	title := c.Query("title")
-	price := c.Query("price")
-
-	c.JSON(http.StatusOK, gin.H{"title": title, "price": price})
-}
-
-type BookInput struct {
-	Title string
-	Price int
-	SubTitle string `json:"sub_title"`
-}
-
-func postBooksHandler(c *gin.Context) {
-	
-	var bookInput BookInput
-
-	err := c.ShouldBindJSON(&bookInput)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H {
-		"title" : bookInput.Title,
-		"price" : bookInput.Price,
-		"sub_title" : bookInput.SubTitle,
-	}) 
-}
-
